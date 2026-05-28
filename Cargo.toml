@@ -1,0 +1,90 @@
+[package]
+name = "rift"
+version = "0.1.0"
+edition = "2021"
+description = "Cross-engine game asset pipeline manager — convert, validate, and deploy assets to Unity, Godot, and Unreal from a single YAML config"
+license = "Apache-2.0"
+authors = ["synthalorian"]
+readme = "README.md"
+homepage = "https://github.com/synthalorian/rift"
+repository = "https://github.com/synthalorian/rift"
+documentation = "https://github.com/synthalorian/rift#readme"
+keywords = ["game-dev", "asset-pipeline", "cli", "converter", "textures", "game-development", "unity", "godot", "unreal-engine", "devops"]
+categories = ["command-line-utilities", "development-tools::build-utils", "game-development", "multimedia::images"]
+include = ["/src", "/hub", "/rift.yml.example", "/README.md", "/LICENSE", "/CONTRIBUTING.md"]
+
+[[bin]]
+name = "rift"
+path = "src/main.rs"
+
+[dependencies]
+# CLI argument parsing
+clap = { version = "4", features = ["derive"] }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Config / serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+
+# Filesystem
+walkdir = "2"
+notify = { version = "7", features = ["macos_kqueue"] }
+
+# Image processing
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "tiff", "bmp"] }
+
+# Audio (basic WAV parsing / validation)
+hound = "3.5"
+ogg = "0.9"
+
+# SQLite state database
+rusqlite = { version = "0.33", features = ["bundled"] }
+
+# Hashing (content-aware caching)
+sha2 = "0.10"
+hex = "0.4"
+
+# HTTP API (embedded Axum)
+axum = "0.8"
+tower-http = { version = "0.6", features = ["cors"] }
+
+# Error handling
+anyhow = "1"
+thiserror = "2"
+
+# Terminal output
+indicatif = "0.17"
+colored = "2"
+
+# Timestamps
+chrono = { version = "0.4", features = ["serde"] }
+
+# Tracing / logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Glob pattern matching
+glob = "0.3"
+
+# UUIDs for pipeline run IDs
+uuid = { version = "1", features = ["v4"] }
+
+# Shell completions
+clap_complete = "4"
+
+# Parallel iteration
+rayon = "1"
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"
+tempfile = "3"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

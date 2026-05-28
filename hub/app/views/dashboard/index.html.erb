@@ -1,0 +1,84 @@
+<% content_for :head do %>
+  <meta http-equiv="refresh" content="15">
+<% end %>
+
+<% if defined?(@error) && @error %>
+  <div class="error-box"><%= @error %></div>
+<% end %>
+
+<div class="stats-grid">
+  <div class="stat-card info">
+    <div class="stat-value"><%= @total_assets %></div>
+    <div class="stat-label">Total Assets</div>
+  </div>
+  <div class="stat-card ok">
+    <div class="stat-value"><%= @counts["ok"] || 0 %></div>
+    <div class="stat-label">Converted ✓</div>
+  </div>
+  <div class="stat-card pending">
+    <div class="stat-value"><%= @counts["pending"] || 0 %></div>
+    <div class="stat-label">Pending ⋯</div>
+  </div>
+  <div class="stat-card error">
+    <div class="stat-value"><%= @counts["error"] || 0 %></div>
+    <div class="stat-label">Errors ✗</div>
+  </div>
+</div>
+
+<% if @last_run %>
+  <div class="card">
+    <div class="card-title">Last Pipeline Run</div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <span class="mono"><%= @last_run["id"].to_s[0..7] %>…</span>
+        <span style="color: var(--text-muted); margin-left: 1rem;">
+          <%= Time.parse(@last_run["timestamp"]).strftime("%b %d, %Y at %H:%M:%S") rescue @last_run["timestamp"] %>
+        </span>
+      </div>
+      <div>
+        <span class="badge ok"><%= @last_run["converted"] %> converted</span>
+        <% if (@last_run["errors"] || 0) > 0 %>
+          <span class="badge error" style="margin-left: 0.5rem;"><%= @last_run["errors"] %> errors</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% if @recent_runs.any? %>
+  <div class="card">
+    <div class="card-title">Recent Runs</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Run ID</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>Converted</th>
+          <th>Errors</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @recent_runs.each do |run| %>
+          <tr>
+            <td><span class="run-id"><%= run["id"].to_s[0..12] %>…</span></td>
+            <td class="mono"><%= Time.parse(run["timestamp"]).strftime("%H:%M:%S") rescue run["timestamp"] %></td>
+            <td><span class="badge <%= run["status"] %>"><%= run["status"] %></span></td>
+            <td class="mono"><%= run["converted"] || 0 %></td>
+            <td class="mono"><%= run["errors"] || 0 %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<div style="text-align: center; padding: 2rem 0;">
+  <div class="live-indicator">
+    <span class="live-dot"></span>
+    Pipeline ready &middot; auto-refreshes every 15s
+  </div>
+  <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace;">
+    <%= Time.now.strftime("%H:%M:%S UTC") %>
+  </div>
+</div>

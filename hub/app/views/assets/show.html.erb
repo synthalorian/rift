@@ -1,0 +1,46 @@
+<% if defined?(@error) && @error %>
+  <div class="error-box"><%= @error %></div>
+<% end %>
+
+<% if @asset %>
+  <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+    <a href="/assets" style="color: var(--neon-cyan); text-decoration: none; font-size: 0.9rem;">← Assets</a>
+    <span style="color: var(--text-muted);">/</span>
+    <span class="mono" style="color: var(--text-primary);"><%= @asset["relative_path"] %></span>
+    <span class="badge <%= @asset["status"] %>"><%= @asset["status"] %></span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Asset Details</div>
+    <table>
+      <tbody>
+        <tr>
+          <td style="width: 180px; color: var(--text-muted); font-weight: 500;">Relative Path</td>
+          <td class="mono"><%= @asset["relative_path"] %></td>
+        </tr>
+        <tr>
+          <td style="color: var(--text-muted); font-weight: 500;">SHA256</td>
+          <td class="mono" style="font-size: 0.75rem; word-break: break-all;"><%= @asset["sha256"] %></td>
+        </tr>
+        <tr>
+          <td style="color: var(--text-muted); font-weight: 500;">Status</td>
+          <td><span class="badge <%= @asset["status"] %>"><%= @asset["status"] %></span></td>
+        </tr>
+        <tr>
+          <td style="color: var(--text-muted); font-weight: 500;">Last Modified</td>
+          <td class="mono"><%= @asset["last_modified"] %></td>
+        </tr>
+        <tr>
+          <td style="color: var(--text-muted); font-weight: 500;">Last Converted</td>
+          <td class="mono"><%= @asset["last_converted"] || "—" %></td>
+        </tr>
+        <% if @asset["error_message"].present? %>
+          <tr>
+            <td style="color: var(--text-muted); font-weight: 500;">Error</td>
+            <td><div class="error-message"><%= @asset["error_message"] %></div></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

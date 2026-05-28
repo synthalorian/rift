@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rift — <%= @title || "Dashboard" %></title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <%= yield :head %>
+    <style>
+      :root {
+        --neon-pink: #ff2d95;
+        --neon-cyan: #00f0ff;
+        --neon-purple: #b829f0;
+        --neon-yellow: #f0e829;
+        --bg-dark: #0a0a1a;
+        --bg-card: #12122a;
+        --bg-card-hover: #1a1a3a;
+        --text-primary: #e0e0ff;
+        --text-secondary: #8888bb;
+        --text-muted: #555577;
+        --border-color: #2a2a4a;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg-dark);
+        color: var(--text-primary);
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      .scanline {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 240, 255, 0.015) 2px,
+          rgba(0, 240, 255, 0.015) 4px
+        );
+        pointer-events: none;
+        z-index: 9999;
+        animation: scanline-scroll 8s linear infinite;
+      }
+
+      .synth-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+          linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .app {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+      }
+
+      .logo {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .logo-sub {
+        font-size: 0.7rem;
+        font-weight: 400;
+        -webkit-text-fill-color: var(--text-secondary);
+        display: block;
+      }
+
+      nav {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      nav a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+      }
+
+      nav a:hover, nav a.active {
+        color: var(--neon-cyan);
+        background: rgba(0, 240, 255, 0.08);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.2s;
+      }
+
+      .stat-card:hover {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+      }
+
+      .stat-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .stat-card.ok .stat-value { color: #22c55e; }
+      .stat-card.pending .stat-value { color: var(--neon-yellow); }
+      .stat-card.error .stat-value { color: #ef4444; }
+      .stat-card.info .stat-value { color: var(--neon-cyan); }
+
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .card-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(42, 42, 74, 0.5);
+        font-size: 0.9rem;
+      }
+
+      tr:hover td {
+        background: var(--bg-card-hover);
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 500;
+      }
+
+      .badge.ok { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+      .badge.pending { background: rgba(240, 232, 41, 0.15); color: var(--neon-yellow); }
+      .badge.error { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+      .badge.running { background: rgba(0, 240, 255, 0.15); color: var(--neon-cyan); }
+
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+      }
+
+      .filter-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .filter-bar a {
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.85rem;
+      }
+
+      .filter-bar a:hover, .filter-bar a.active {
+        color: var(--neon-cyan);
+        background: rgba(0, 240, 255, 0.1);
+      }
+
+      .error-box {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        color: #ef4444;
+        margin-bottom: 1rem;
+      }
+
+      .error-message {
+        color: #ef4444;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        word-break: break-word;
+      }
+
+      .asset-path {
+        max-width: 400px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .run-id {
+        color: var(--text-muted);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+      }
+
+      .sunset-footer {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .sunset-footer .neon {
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-yellow));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      @keyframes scanline-scroll {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 100px; }
+      }
+
+      @keyframes neon-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+
+      .live-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #22c55e;
+        font-size: 0.8rem;
+      }
+
+      .live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+        animation: neon-pulse 2s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanline"></div>
+    <div class="synth-grid"></div>
+
+    <div class="app">
+      <header>
+        <div>
+          <div class="logo">
+            RIFT
+            <span class="logo-sub">/ cross-engine pipeline</span>
+          </div>
+        </div>
+        <nav>
+          <a href="/" class="<%= 'active' if current_page?(root_path) %>">Dashboard</a>
+          <a href="/assets" class="<%= 'active' if current_page?(assets_path) %>">Assets</a>
+          <a href="/runs" class="<%= 'active' if current_page?(pipeline_runs_path) %>">Runs</a>
+          <a href="/errors" class="<%= 'active' if current_page?(errors_path) %>">Errors</a>
+        </nav>
+      </header>
+
+      <%= yield %>
+
+      <div class="sunset-footer">
+        <span class="neon">⚡ RIFT</span> // Engine-agnostic asset pipeline // <span class="neon">🎹🦞</span>
+      </div>
+    </div>
+  </body>
+</html>

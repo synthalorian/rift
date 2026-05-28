@@ -1,0 +1,62 @@
+<% if defined?(@error) && @error %>
+  <div class="error-box"><%= @error %></div>
+<% end %>
+
+<div class="card">
+  <div class="card-title">Asset Browser</div>
+
+  <form action="/assets" method="get" style="margin-bottom: 1rem;">
+    <input type="text" name="q" placeholder="Search assets by name or path..." value="<%= params[:q] %>"
+           style="width: 100%; padding: 0.6rem 1rem; background: var(--bg-dark); border: 1px solid var(--border-color);
+                  border-radius: 8px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+                  outline: none;">
+  </form>
+
+  <div class="filter-bar">
+    <a href="/assets" class="<%= 'active' unless @status_filter.present? %>">All (<%= @counts.values.sum %>)</a>
+    <a href="/assets?status=ok" class="<%= 'active' if @status_filter == 'ok' %>">✓ OK (<%= @counts["ok"] || 0 %>)</a>
+    <a href="/assets?status=pending" class="<%= 'active' if @status_filter == 'pending' %>">⋯ Pending (<%= @counts["pending"] || 0 %>)</a>
+    <a href="/assets?status=error" class="<%= 'active' if @status_filter == 'error' %>">✗ Errors (<%= @counts["error"] || 0 %>)</a>
+  </div>
+
+  <% if @assets.any? %>
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Asset</th>
+          <th>SHA256</th>
+          <th>Modified</th>
+          <th>Converted</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @assets.each do |asset| %>
+          <tr>
+            <td><span class="badge <%= asset["status"] %>"><%= asset["status"] %></span></td>
+            <td class="asset-path mono">
+              <a href="/assets/<%= ERB::Util.url_encode(asset["relative_path"]) %>" style="color: var(--neon-cyan); text-decoration: none;">
+                <%= asset["relative_path"] %>
+              </a>
+            </td>
+            <td class="mono" style="color: var(--text-muted); font-size: 0.75rem;"><%= asset["sha256"].to_s[0..12] %>…</td>
+            <td style="color: var(--text-muted); font-size: 0.8rem;"><%= asset["last_modified"].to_s[0..18] rescue "—" %></td>
+            <td style="color: var(--text-muted); font-size: 0.8rem;">
+              <%= asset["last_converted"].to_s[0..18] rescue "—" %>
+            </td>
+            <td>
+              <% if asset["error_message"].present? %>
+                <div class="error-message"><%= asset["error_message"].to_s.truncate(60) %></div>
+              <% else %>
+                <span style="color: var(--text-muted);">—</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No assets found. Run <code class="mono">rift run</code> to populate the database.</p>
+  <% end %>
+</div>

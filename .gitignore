@@ -1,0 +1,20 @@
+/target/
+**/*.rs.bk
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rift data (local only)
+*.db
+.ruff_cache/
+
+# OMO / OpenCode
+.omo/
