@@ -1,0 +1,56 @@
+pipeline:
+  name: "game-assets"
+  version: 1
+
+source:
+  root: "raw-assets"
+  watch: true
+
+# Multiple engine targets — output to each project
+targets:
+  - engine: unity
+    project: "unity-project/Assets/Rift"
+    textures:
+      format: png
+      max_width: 2048
+      max_height: 2048
+      generate_mipmaps: false
+    audio:
+      format: ogg
+      bitrate: "128k"
+
+  - engine: godot
+    project: "godot-project/assets/rift"
+    textures:
+      format: png
+      max_width: 1024
+      max_height: 1024
+    audio:
+      format: ogg
+      bitrate: "128k"
+
+  - engine: unreal
+    project: "unreal-project/Content/Rift"
+    textures:
+      format: png
+      max_width: 4096
+      max_height: 4096
+    audio:
+      format: wav
+      bitrate: "44100"
+
+# Rules match file patterns to conversion steps
+rules:
+  - pattern: "**/*.psd"
+    convert: textures
+    remove_original: false
+
+  - pattern: "**/*.{png,jpg,jpeg,tga,bmp,webp,tiff}"
+    convert: textures
+
+  - pattern: "**/*.{wav,mp3,aiff,flac}"
+    convert: audio
+
+  - pattern: "**/*.{fbx,gltf,glb,obj,blend}"
+    convert: models
+    validate: true

@@ -1,0 +1,40 @@
+<% if defined?(@error) && @error %>
+  <div class="error-box"><%= @error %></div>
+<% end %>
+
+<div class="card">
+  <div class="card-title">Pipeline Runs</div>
+
+  <% if @runs.any? %>
+    <table>
+      <thead>
+        <tr>
+          <th>Run ID</th>
+          <th>Timestamp</th>
+          <th>Status</th>
+          <th>Converted</th>
+          <th>Errors</th>
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @runs.each do |run| %>
+          <tr>
+            <td><span class="run-id"><a href="/runs/<%= run["id"] %>" style="color: var(--neon-cyan); text-decoration: none;"><%= run["id"].to_s[0..12] %>…</a></span></td>
+            <td class="mono">
+              <%= Time.parse(run["timestamp"]).strftime("%b %d, %H:%M:%S") rescue run["timestamp"] %>
+            </td>
+            <td><span class="badge <%= run["status"] %>"><%= run["status"] %></span></td>
+            <td class="mono"><%= run["converted"] || 0 %></td>
+            <td class="mono"><%= run["errors"] || 0 %></td>
+            <td style="color: var(--text-muted); font-size: 0.8rem;">
+              <%= run["summary"].to_s.truncate(80) rescue "—" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No pipeline runs yet. Run <code class="mono">rift run</code> to start.</p>
+  <% end %>
+</div>

@@ -1,0 +1,74 @@
+<% if defined?(@error) && @error %>
+  <div class="error-box"><%= @error %></div>
+<% end %>
+
+<% if @run %>
+  <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+    <a href="/runs" style="color: var(--neon-cyan); text-decoration: none; font-size: 0.9rem;">← Runs</a>
+    <span style="color: var(--text-muted);">/</span>
+    <span class="run-id"><%= @run["id"] %></span>
+    <span class="badge <%= @run["status"] %>"><%= @run["status"] %></span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Run Overview</div>
+    <table>
+      <tbody>
+        <tr>
+          <td style="width: 180px; color: var(--text-muted); font-weight: 500;">Run ID</td>
+          <td class="mono" style="font-size: 0.75rem;"><%= @run["id"] %></td>
+        </tr>
+        <tr>
+          <td style="color: var(--text-muted); font-weight: 500;">Timestamp</td>
+          <td class="mono"><%= @run["timestamp"] %></td>
+        </tr>
+        <tr>
+          <td style="color: var(--text-muted); font-weight: 500;">Status</td>
+          <td><span class="badge <%= @run["status"] %>"><%= @run["status"] %></span></td>
+        </tr>
+        <tr>
+          <td style="color: var(--text-muted); font-weight: 500;">Total Assets</td>
+          <td class="mono"><%= @run["total_assets"] || 0 %></td>
+        </tr>
+        <tr>
+          <td style="color: var(--text-muted); font-weight: 500;">Converted</td>
+          <td class="mono" style="color: #22c55e;"><%= @run["converted"] || 0 %></td>
+        </tr>
+        <tr>
+          <td style="color: var(--text-muted); font-weight: 500;">Errors</td>
+          <td class="mono" style="color: <%= (@run["errors"] || 0) > 0 ? '#ef4444' : 'inherit' %>;"><%= @run["errors"] || 0 %></td>
+        </tr>
+        <% if @run["summary"].present? %>
+          <tr>
+            <td style="color: var(--text-muted); font-weight: 500;">Summary</td>
+            <td><%= @run["summary"] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @errors.any? %>
+    <div class="card">
+      <div class="card-title">Errors (<%= @errors.count %>)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Asset</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @errors.each do |err| %>
+            <tr>
+              <td><span class="badge error"><%= err["error_type"] %></span></td>
+              <td class="asset-path mono"><%= err["relative_path"] %></td>
+              <td><div class="error-message"><%= err["message"].to_s.truncate(100) %></div></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+<% end %>
