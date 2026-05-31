@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1
+# Development Dockerfile for Rift Hub
+# Build context is the project root (docker-compose.yml location)
+# The hub/ directory is mounted at /rails at runtime
+
+ARG RUBY_VERSION=4.0.4
+FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+WORKDIR /rails
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential git libyaml-dev pkg-config sqlite3 && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Install Node.js for asset compilation (jsbundling, CSS)
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y nodejs && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+EXPOSE 80
+
+# Gems will be installed at container start from the mounted volume
+# Use bin/dev which runs Foreman with Procfile.dev
+CMD ["/bin/bash", "-c", "bundle install && ./bin/dev"]

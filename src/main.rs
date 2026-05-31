@@ -40,6 +40,9 @@ async fn main() -> StdResult<(), Box<dyn std::error::Error>> {
         rift::cli::Commands::Completions { shell } => {
             cmd_completions(shell)?;
         }
+        rift::cli::Commands::Upgrade {} => {
+            cmd_upgrade().await?;
+        }
     }
 
     Ok(())
@@ -48,7 +51,9 @@ async fn main() -> StdResult<(), Box<dyn std::error::Error>> {
 fn cmd_init(engine: &str) -> StdResult<(), Box<dyn std::error::Error>> {
     let path = Path::new("rift.yml");
     if path.exists() {
-        return Err("rift.yml already exists in this directory".into());
+        eprintln!("{}", "⚠️  rift.yml already exists in this directory".yellow().bold());
+        eprintln!("   Remove it first: {}", "rm rift.yml".bright_cyan());
+        return Err("rift.yml already exists".into());
     }
 
     let (source_root, targets) = match engine {
@@ -329,6 +334,44 @@ fn cmd_status(db_path: Option<&str>, show_assets: bool) -> StdResult<(), Box<dyn
             };
             println!("   {} {} — {}", colored_icon, asset.relative_path.cyan(), colored_status);
         }
+    }
+
+    Ok(())
+}
+
+async fn cmd_upgrade() -> StdResult<(), Box<dyn std::error::Error>> {
+    println!("{}", "🔍 Checking for updates...".bright_cyan().bold());
+
+    let client = reqwest::Client::builder()
+        .user_agent("rift-upgrade/0.1.0")
+        .timeout(std::time::Duration::from_secs(10))
+        .build()?;
+
+    let url = "https://api.github.com/repos/synthalorian/rift/releases/latest";
+    let resp = client.get(url).send().await?;
+
+    if !resp.status().is_success() {
+        println!("   {}", "Could not check for updates.".yellow());
+        println!("   {}", "Manual update: cargo install --path .".dimmed());
+        return Ok(());
+    }
+
+    let release: serde_json::Value = resp.json().await?;
+    let latest_tag = release["tag_name"]
+        .as_str()
+        .unwrap_or("unknown")
+        .to_string();
+    let current_version = env!("CARGO_PKG_VERSION");
+
+    println!("   {}  v{}", "Current version:".bold(), current_version);
+    println!("   {}  {}", "Latest version:".bold(), latest_tag.bright_cyan());
+
+    if latest_tag.trim_start_matches('v') == current_version {
+        println!("\n{}  You're on the latest version!", "✅".green().bold());
+    } else {
+        println!("\n{}  Update available!", "📦".bright_cyan().bold());
+        println!("   Run: {}", "cargo install --git https://github.com/synthalorian/rift.git".bright_white());
+        println!("   Or download from: {}", "https://github.com/synthalorian/rift/releases".bright_cyan());
     }
 
     Ok(())

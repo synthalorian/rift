@@ -64,6 +64,9 @@ pub enum Commands {
         #[arg(value_enum)]
         shell: Shell,
     },
+
+    /// Check for updates and install the latest version
+    Upgrade {},
 }
 
 /// Generate completion script for the given shell

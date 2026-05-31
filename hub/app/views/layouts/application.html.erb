@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <%= yield :head %>
+    <%= javascript_importmap_tags %>
     <style>
       :root {
         --neon-pink: #ff2d95;
@@ -314,6 +315,25 @@
         border-radius: 50%;
         background: #22c55e;
         animation: neon-pulse 2s ease-in-out infinite;
+      }
+
+      .stat-card.updated {
+        animation: stat-update 1s ease-out;
+      }
+
+      @keyframes stat-update {
+        0% { border-color: var(--neon-cyan); box-shadow: 0 0 25px rgba(0, 240, 255, 0.3); }
+        100% { border-color: var(--border-color); box-shadow: none; }
+      }
+
+      .live-indicator.pulse .live-dot {
+        animation: refresh-pulse 0.3s ease-out;
+      }
+
+      @keyframes refresh-pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.5); opacity: 0.5; }
+        100% { transform: scale(1); }
       }
     </style>
   </head>
