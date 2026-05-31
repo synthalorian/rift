@@ -1,0 +1,26 @@
+# Rift Hub — local development with hot reload
+# Start: docker compose up
+# The hub will be available at http://localhost:3000
+# The Rift CLI binary (built separately) can be used with the hub's database
+
+services:
+  hub:
+    build:
+      context: .
+      dockerfile: hub/Dockerfile.dev
+    ports:
+      - "3000:80"
+    volumes:
+      - ./hub:/rails
+      - bundle_data:/usr/local/bundle
+      - rift_data:/rails/.rift
+    environment:
+      RAILS_ENV: development
+      RIFT_DB_PATH: /rails/.rift/state.db
+    stdin_open: true
+    tty: true
+    depends_on: []
+
+volumes:
+  bundle_data:
+  rift_data:

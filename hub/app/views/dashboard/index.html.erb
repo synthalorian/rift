@@ -1,32 +1,31 @@
-<% content_for :head do %>
-  <meta http-equiv="refresh" content="15">
-<% end %>
+<div data-controller="dashboard"
+     data-dashboard-refresh-interval-value="15">
 
 <% if defined?(@error) && @error %>
   <div class="error-box"><%= @error %></div>
 <% end %>
 
-<div class="stats-grid">
-  <div class="stat-card info">
+<div class="stats-grid" data-dashboard-target="stats">
+  <div class="stat-card info" data-metric="total_assets">
     <div class="stat-value"><%= @total_assets %></div>
     <div class="stat-label">Total Assets</div>
   </div>
-  <div class="stat-card ok">
+  <div class="stat-card ok" data-metric="ok">
     <div class="stat-value"><%= @counts["ok"] || 0 %></div>
     <div class="stat-label">Converted ✓</div>
   </div>
-  <div class="stat-card pending">
+  <div class="stat-card pending" data-metric="pending">
     <div class="stat-value"><%= @counts["pending"] || 0 %></div>
     <div class="stat-label">Pending ⋯</div>
   </div>
-  <div class="stat-card error">
+  <div class="stat-card error" data-metric="errors">
     <div class="stat-value"><%= @counts["error"] || 0 %></div>
     <div class="stat-label">Errors ✗</div>
   </div>
 </div>
 
 <% if @last_run %>
-  <div class="card">
+  <div class="card" data-dashboard-target="lastRun">
     <div class="card-title">Last Pipeline Run</div>
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <div>
@@ -46,7 +45,7 @@
 <% end %>
 
 <% if @recent_runs.any? %>
-  <div class="card">
+  <div class="card" data-dashboard-target="recentRuns">
     <div class="card-title">Recent Runs</div>
     <table>
       <thead>
@@ -74,11 +73,12 @@
 <% end %>
 
 <div style="text-align: center; padding: 2rem 0;">
-  <div class="live-indicator">
+  <div class="live-indicator" data-dashboard-target="indicator">
     <span class="live-dot"></span>
-    Pipeline ready &middot; auto-refreshes every 15s
+    Pipeline ready &middot; live updates
   </div>
-  <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace;">
+  <div data-dashboard-target="timestamp" style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace;">
     <%= Time.now.strftime("%H:%M:%S UTC") %>
   </div>
+</div>
 </div>

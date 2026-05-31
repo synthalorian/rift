@@ -3,16 +3,26 @@ class AssetsController < ApplicationController
     @title = "Assets"
     @status_filter = params[:status]
     @search_query = params[:q]
+
     if @search_query.present?
       @assets = RiftDb.search_assets(@search_query, status: @status_filter.presence, limit: 100)
     else
       @assets = RiftDb.assets(status: @status_filter.presence, limit: 100, offset: 0)
     end
     @counts = RiftDb.asset_counts
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream { render partial: "asset_table", locals: { assets: @assets, error: @error } }
+    end
   rescue SQLite3::Exception => e
     @error = "Cannot read Rift database: #{e.message}"
     @assets = []
     @counts = {"ok" => 0, "pending" => 0, "error" => 0}
+    respond_to do |format|
+      format.html
+      format.turbo_stream { render partial: "asset_table", locals: { assets: [], error: @error } }
+    end
   end
 
   def show
