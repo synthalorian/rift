@@ -18,3 +18,9 @@ Thumbs.db
 
 # OMO / OpenCode
 .omo/
+
+# Hub (Rails dashboard)
+hub/vendor/
+hub/storage/*.sqlite3*
+hub/log/
+hub/tmp/

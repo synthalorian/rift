@@ -14,7 +14,7 @@ pub struct PipelineConfig {
     pub hooks: HooksConfig,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct HooksConfig {
     /// Shell command to run before the pipeline starts
     #[serde(default)]
@@ -25,16 +25,6 @@ pub struct HooksConfig {
     /// Shell command to run if the pipeline encounters errors
     #[serde(default)]
     pub on_error: Option<String>,
-}
-
-impl Default for HooksConfig {
-    fn default() -> Self {
-        Self {
-            pre_run: None,
-            post_run: None,
-            on_error: None,
-        }
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

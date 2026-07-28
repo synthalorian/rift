@@ -173,7 +173,9 @@ impl Runner {
         let pb = ProgressBar::new(jobs.len() as u64);
         pb.set_style(
             ProgressStyle::default_bar()
-                .template("{spinner:.cyan} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len}  {msg}")
+                .template(
+                    "{spinner:.cyan} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len}  {msg}",
+                )
                 .unwrap()
                 .progress_chars("=> "),
         );
@@ -216,7 +218,10 @@ impl Runner {
         }
 
         self.db.complete_run(&run_id, converted, errors)?;
-        info!("Pipeline complete: {} converted, {} errors", converted, errors);
+        info!(
+            "Pipeline complete: {} converted, {} errors",
+            converted, errors
+        );
 
         // Post-run or on-error hook
         if errors > 0 {
@@ -252,11 +257,10 @@ impl Runner {
                 .to_string();
 
             // Match rules
-            let rule_index = config.rules.iter().position(|rule| {
-                Pattern::new(&rule.pattern)
-                    .ok()
-                    .map_or(false, |p| p.matches(&relative))
-            });
+            let rule_index = config
+                .rules
+                .iter()
+                .position(|rule| Pattern::new(&rule.pattern).is_ok_and(|p| p.matches(&relative)));
 
             if let Some(idx) = rule_index {
                 let file_modified = modified_iso(path);

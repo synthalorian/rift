@@ -1,5 +1,5 @@
-use clap::Parser;
 use clap::CommandFactory;
+use clap::Parser;
 use colored::Colorize;
 use std::path::Path;
 use std::result::Result as StdResult;
@@ -10,8 +10,7 @@ async fn main() -> StdResult<(), Box<dyn std::error::Error>> {
     // Initialize logging
     tracing_subscriber::fmt()
         .with_env_filter(
-            EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| EnvFilter::new("info")),
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
         )
         .init();
 
@@ -21,7 +20,11 @@ async fn main() -> StdResult<(), Box<dyn std::error::Error>> {
         rift::cli::Commands::Init { engine } => {
             cmd_init(&engine)?;
         }
-        rift::cli::Commands::Run { config, clean, verbose } => {
+        rift::cli::Commands::Run {
+            config,
+            clean,
+            verbose,
+        } => {
             if verbose {
                 std::env::set_var("RUST_LOG", "debug");
             }
@@ -51,7 +54,12 @@ async fn main() -> StdResult<(), Box<dyn std::error::Error>> {
 fn cmd_init(engine: &str) -> StdResult<(), Box<dyn std::error::Error>> {
     let path = Path::new("rift.yml");
     if path.exists() {
-        eprintln!("{}", "⚠️  rift.yml already exists in this directory".yellow().bold());
+        eprintln!(
+            "{}",
+            "⚠️  rift.yml already exists in this directory"
+                .yellow()
+                .bold()
+        );
         eprintln!("   Remove it first: {}", "rm rift.yml".bright_cyan());
         return Err("rift.yml already exists".into());
     }
@@ -185,16 +193,25 @@ fn cmd_init(engine: &str) -> StdResult<(), Box<dyn std::error::Error>> {
     std::fs::create_dir_all(source_root)?;
     std::fs::create_dir_all(".rift")?;
 
-    println!("{}", "✅ Initialized rift pipeline in ./rift.yml".green().bold());
+    println!(
+        "{}",
+        "✅ Initialized rift pipeline in ./rift.yml".green().bold()
+    );
     println!("   {}  ./{}", "Source:".bold(), source_root);
     println!("   {}   .rift/", "State:".bold());
     println!();
-    println!("   {}", "Run `rift run` to process existing assets".bright_cyan());
+    println!(
+        "   {}",
+        "Run `rift run` to process existing assets".bright_cyan()
+    );
 
     Ok(())
 }
 
-async fn cmd_run(config_path: Option<&str>, clean: bool) -> StdResult<(), Box<dyn std::error::Error>> {
+async fn cmd_run(
+    config_path: Option<&str>,
+    clean: bool,
+) -> StdResult<(), Box<dyn std::error::Error>> {
     let config = match config_path {
         Some(path) => rift::config::PipelineConfig::from_file(Path::new(path))?,
         None => rift::config::PipelineConfig::discover()?,
@@ -218,16 +235,21 @@ async fn cmd_run(config_path: Option<&str>, clean: bool) -> StdResult<(), Box<dy
 
     for result in &results {
         if result.success {
-            println!(
-                "   {} {}",
-                "✓".green().bold(),
-                result.relative_path.cyan()
-            );
+            println!("   {} {}", "✓".green().bold(), result.relative_path.cyan());
             for out in &result.output_paths {
-                println!("     {} {}", "→".bright_blue(), out.display().to_string().dimmed());
+                println!(
+                    "     {} {}",
+                    "→".bright_blue(),
+                    out.display().to_string().dimmed()
+                );
             }
         } else {
-            println!("   {} {} — {}", "✗".red().bold(), result.relative_path.cyan(), result.error.as_deref().unwrap_or("unknown").red());
+            println!(
+                "   {} {} — {}",
+                "✗".red().bold(),
+                result.relative_path.cyan(),
+                result.error.as_deref().unwrap_or("unknown").red()
+            );
         }
     }
 
@@ -264,7 +286,10 @@ async fn cmd_watch(
     Ok(())
 }
 
-fn cmd_status(db_path: Option<&str>, show_assets: bool) -> StdResult<(), Box<dyn std::error::Error>> {
+fn cmd_status(
+    db_path: Option<&str>,
+    show_assets: bool,
+) -> StdResult<(), Box<dyn std::error::Error>> {
     let path = match db_path {
         Some(p) => Path::new(p).to_path_buf(),
         None => {
@@ -280,7 +305,11 @@ fn cmd_status(db_path: Option<&str>, show_assets: bool) -> StdResult<(), Box<dyn
     let db = rift::db::AssetDb::open(&path)?;
 
     let counts = db.get_asset_counts()?;
-    println!("{} {}\n", "📦".bright_cyan(), format!("Asset Database: {}", path.display()).bright_white());
+    println!(
+        "{} {}\n",
+        "📦".bright_cyan(),
+        format!("Asset Database: {}", path.display()).bright_white()
+    );
 
     let total: u32 = counts.values().sum();
     let ok = counts.get("ok").copied().unwrap_or(0);
@@ -304,7 +333,7 @@ fn cmd_status(db_path: Option<&str>, show_assets: bool) -> StdResult<(), Box<dyn
             };
             println!(
                 "   {} [{}] {} converted, {} errors",
-                &run.id[..8].dimmed(),
+                run.id[..8].dimmed(),
                 status_color,
                 run.converted,
                 run.errors
@@ -332,7 +361,12 @@ fn cmd_status(db_path: Option<&str>, show_assets: bool) -> StdResult<(), Box<dyn
                 "red" => icon.red().bold().to_string(),
                 _ => icon.yellow().to_string(),
             };
-            println!("   {} {} — {}", colored_icon, asset.relative_path.cyan(), colored_status);
+            println!(
+                "   {} {} — {}",
+                colored_icon,
+                asset.relative_path.cyan(),
+                colored_status
+            );
         }
     }
 
@@ -364,14 +398,24 @@ async fn cmd_upgrade() -> StdResult<(), Box<dyn std::error::Error>> {
     let current_version = env!("CARGO_PKG_VERSION");
 
     println!("   {}  v{}", "Current version:".bold(), current_version);
-    println!("   {}  {}", "Latest version:".bold(), latest_tag.bright_cyan());
+    println!(
+        "   {}  {}",
+        "Latest version:".bold(),
+        latest_tag.bright_cyan()
+    );
 
     if latest_tag.trim_start_matches('v') == current_version {
         println!("\n{}  You're on the latest version!", "✅".green().bold());
     } else {
         println!("\n{}  Update available!", "📦".bright_cyan().bold());
-        println!("   Run: {}", "cargo install --git https://github.com/synthalorian/rift.git".bright_white());
-        println!("   Or download from: {}", "https://github.com/synthalorian/rift/releases".bright_cyan());
+        println!(
+            "   Run: {}",
+            "cargo install --git https://github.com/synthalorian/rift.git".bright_white()
+        );
+        println!(
+            "   Or download from: {}",
+            "https://github.com/synthalorian/rift/releases".bright_cyan()
+        );
     }
 
     Ok(())

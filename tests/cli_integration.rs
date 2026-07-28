@@ -187,10 +187,7 @@ fn test_completions_fish() {
 #[test]
 fn test_upgrade_parses() {
     // Just verify the upgrade command parses without crashing
-    rift_bin()
-        .arg("upgrade")
-        .assert()
-        .success();
+    rift_bin().arg("upgrade").assert().success();
 }
 
 #[test]

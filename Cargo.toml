@@ -1,6 +1,6 @@
 [package]
 name = "rift"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 description = "Cross-engine game asset pipeline manager — convert, validate, and deploy assets to Unity, Godot, and Unreal from a single YAML config"
 license = "Apache-2.0"

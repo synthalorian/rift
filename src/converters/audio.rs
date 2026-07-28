@@ -150,7 +150,7 @@ fn validate_wav(path: &Path) -> crate::Result<()> {
         )));
     }
 
-    if sample_rate < 4000 || sample_rate > 384000 {
+    if !(4000..=384000).contains(&sample_rate) {
         return Err(RiftError::Conversion(format!(
             "Unsupported sample rate ({} Hz): {}",
             sample_rate,

@@ -7,4 +7,4 @@ pub mod engines;
 pub mod error;
 pub mod pipeline;
 
-pub use error::{RiftError, Result};
+pub use error::{Result, RiftError};
