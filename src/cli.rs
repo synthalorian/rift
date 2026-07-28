@@ -2,7 +2,11 @@ use clap::{Command, Parser, Subcommand};
 use clap_complete::{Generator, Shell};
 
 #[derive(Parser)]
-#[command(name = "rift", version = "0.1.0", about = "Cross-engine game asset pipeline manager")]
+#[command(
+    name = "rift",
+    version = "0.1.0",
+    about = "Cross-engine game asset pipeline manager"
+)]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,

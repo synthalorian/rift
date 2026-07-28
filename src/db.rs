@@ -118,8 +118,7 @@ impl AssetDb {
 
     pub fn needs_conversion(&self, path: &str) -> crate::Result<bool> {
         let conn = self.conn.lock().unwrap();
-        let mut stmt = conn
-            .prepare("SELECT status FROM assets WHERE relative_path = ?1")?;
+        let mut stmt = conn.prepare("SELECT status FROM assets WHERE relative_path = ?1")?;
         let result: std::result::Result<String, _> =
             stmt.query_row(params![path], |row| row.get(0));
         match result {
@@ -149,8 +148,8 @@ impl AssetDb {
 
     pub fn get_asset_counts(&self) -> crate::Result<HashMap<String, u32>> {
         let conn = self.conn.lock().unwrap();
-        let mut stmt = conn
-            .prepare("SELECT status, COUNT(*) as count FROM assets GROUP BY status")?;
+        let mut stmt =
+            conn.prepare("SELECT status, COUNT(*) as count FROM assets GROUP BY status")?;
         let rows = stmt.query_map([], |row| {
             Ok((row.get::<_, String>(0)?, row.get::<_, u32>(1)?))
         })?;
@@ -264,7 +263,8 @@ impl AssetDb {
 
     pub fn close(self) -> crate::Result<()> {
         let conn = self.conn.into_inner().unwrap();
-        conn.close().map_err(|(_, e)| crate::RiftError::Database(e))?;
+        conn.close()
+            .map_err(|(_, e)| crate::RiftError::Database(e))?;
         Ok(())
     }
 }

@@ -1,11 +1,5 @@
 use crate::db::AssetDb;
-use axum::{
-    Router,
-    extract::State,
-    http::Method,
-    routing::get,
-    Json,
-};
+use axum::{extract::State, http::Method, routing::get, Json, Router};
 use serde::Serialize;
 use std::sync::Arc;
 use tower_http::cors::{Any, CorsLayer};
@@ -25,9 +19,7 @@ pub struct StatusResponse {
 
 /// Start the embedded HTTP API server
 pub async fn serve(db: AssetDb, port: u16) -> crate::Result<()> {
-    let state = ApiState {
-        db: Arc::new(db),
-    };
+    let state = ApiState { db: Arc::new(db) };
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST])

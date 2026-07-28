@@ -42,5 +42,4 @@ pub enum RiftError {
     Other(String),
 }
 
-
 pub type Result<T> = std::result::Result<T, RiftError>;
