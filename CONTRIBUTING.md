@@ -1,6 +1,6 @@
 # Contributing to Rift
 
-First off, thanks for taking the time to contribute! 🎹🦈
+First off, thanks for taking the time to contribute! 🎹🦞
 
 Rift is a cross-engine game asset pipeline manager. It converts, validates, and deploys game assets to Unity, Godot, and Unreal — all from a single YAML config.
 
@@ -186,4 +186,4 @@ Maintainers handle releases:
 
 ---
 
-**Rift. Bridge the engines.** 🎹🦈
+**Rift. Bridge the engines.** 🎹🦞
