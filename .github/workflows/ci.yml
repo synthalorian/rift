@@ -136,6 +136,11 @@ jobs:
           bundler-cache: true
           working-directory: hub
 
+      - name: Prepare test database
+        env:
+          RAILS_ENV: test
+        run: bin/rails db:prepare
+
       - name: Run tests
         env:
           RAILS_ENV: test
