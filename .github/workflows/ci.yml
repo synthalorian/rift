@@ -144,7 +144,7 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
-        run: bin/rails db:test:prepare test
+        run: bin/rails test
 
   # ── Cross-platform build check (push to main only to save CI minutes) ──
 
