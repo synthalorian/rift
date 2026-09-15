@@ -23,7 +23,7 @@ class DashboardController < ApplicationController
   rescue SQLite3::Exception => e
     @error = "Cannot connect to Rift database: #{e.message}"
     @total_assets = 0
-    @counts = {"ok" => 0, "pending" => 0, "error" => 0}
+    @counts = { "ok" => 0, "pending" => 0, "error" => 0 }
     @recent_runs = []
     @last_run = nil
 

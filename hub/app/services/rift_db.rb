@@ -177,7 +177,7 @@ class RiftDb
     end
 
     def default_counts
-      {"ok" => 0, "pending" => 0, "error" => 0}
+      { "ok" => 0, "pending" => 0, "error" => 0 }
     end
 
     def find_db_path

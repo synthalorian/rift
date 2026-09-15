@@ -18,7 +18,7 @@ class AssetsController < ApplicationController
   rescue SQLite3::Exception => e
     @error = "Cannot read Rift database: #{e.message}"
     @assets = []
-    @counts = {"ok" => 0, "pending" => 0, "error" => 0}
+    @counts = { "ok" => 0, "pending" => 0, "error" => 0 }
     respond_to do |format|
       format.html
       format.turbo_stream { render partial: "asset_table", locals: { assets: [], error: @error } }
